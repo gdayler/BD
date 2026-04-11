@@ -1,0 +1,325 @@
+<style>
+:root {
+  /* Fondos claros pastel */
+  --color-background-primary: #FEFEFE;
+  --color-background-secondary: #F4F7FA;
+  --color-background-info: #E6F2FF;
+  --color-background-warning: #FFF8E6;
+  --color-background-danger: #FFEDEB;
+  --color-background-success: #E6F9F0;
+
+  /* Textos legibles (tonos pizarra suave, no negro puro) */
+  --color-text-primary: #2C3E50;
+  --color-text-secondary: #5D6D7E;
+  --color-text-info: #2B6CB0;
+  --color-text-warning: #B7791F;
+  --color-text-danger: #C05621;
+  --color-text-success: #276749;
+
+  /* Bordes suaves y casi imperceptibles */
+  --color-border-primary: #D5DCE5;
+  --color-border-secondary: #E8EDF2;
+  --color-border-tertiary: #F0F3F6;
+
+  /* Radios */
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+body {
+  background: #F8FAFC;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+.wrap{max-width:880px;margin:0 auto;padding:1rem;}
+.slide{display:none;}
+.slide.active{display:block;}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary);}
+.step-badge{background:var(--color-background-info);color:var(--color-text-info);font-size:12px;font-weight:500;padding:4px 12px;border-radius:var(--border-radius-md);white-space:nowrap;}
+.step-title{font-size:18px;font-weight:500;color:var(--color-text-primary);}
+.teoria{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1rem 1.25rem;margin-bottom:1.25rem;}
+.teoria h3{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;}
+.pregunta{font-size:15px;font-weight:500;color:var(--color-text-primary);background:var(--color-background-primary);border-left:3px solid #7BA7E0;padding:0.75rem 1rem;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;margin:0.6rem 0;}
+.regla{font-size:14px;color:var(--color-text-primary);background:var(--color-background-primary);border-left:3px solid #5FB89A;padding:0.6rem 0.9rem;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;margin:0.5rem 0;line-height:1.6;}
+.warn{font-size:13px;color:var(--color-text-danger);background:var(--color-background-danger);border-radius:var(--border-radius-md);padding:0.5rem 0.75rem;margin-top:0.5rem;line-height:1.5;}
+.aclaracion{font-size:12px;color:var(--color-text-warning);background:var(--color-background-warning);border-radius:var(--border-radius-md);padding:0.5rem 0.75rem;margin-top:0.4rem;line-height:1.5;}
+.ejemplo{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1rem 1.25rem;margin-bottom:1.25rem;background:var(--color-background-primary);}
+.ejemplo h3{font-size:11px;font-weight:500;color:#5A8FBF;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary);}
+.nav button{padding:7px 18px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);font-size:14px;cursor:pointer;}
+.nav button:hover{background:var(--color-background-secondary);}
+.nav button:disabled{opacity:0.3;cursor:default;}
+.dots{display:flex;gap:6px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--color-border-tertiary);cursor:pointer;transition:background 0.2s;}
+.dot.on{background:#7BA7E0;}
+.ctx-section{margin-bottom:0.75rem;}
+.ctx-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:0.3rem;}
+.ctx-text{font-size:13px;color:var(--color-text-secondary);line-height:1.65;background:var(--color-background-secondary);padding:0.6rem 0.9rem;border-radius:var(--border-radius-md);}
+.principio{font-size:14px;color:var(--color-text-primary);background:var(--color-background-primary);border-left:3px solid #5FB89A;padding:0.75rem 1rem;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;margin-bottom:0.75rem;line-height:1.6;}
+.ent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;margin-top:0.5rem;}
+.ent-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:0.6rem 0.9rem;}
+.ent-card.normal{border-left:3px solid #7BA7E0;}
+.ent-card.debil{border-left:3px solid #E89A9A;}
+.ent-card.herencia{border-left:3px solid #5FB89A;}
+.ent-name{font-size:13px;font-weight:500;color:var(--color-text-primary);}
+.ent-note{font-size:11px;color:var(--color-text-secondary);margin-top:2px;}
+.leyenda{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:0.75rem;font-size:12px;}
+.ley{display:flex;align-items:center;gap:5px;color:var(--color-text-secondary);}
+.attr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:580px){.attr-grid{grid-template-columns:1fr;}.ent-grid{grid-template-columns:1fr 1fr;}}
+.acard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:0.7rem 0.9rem;}
+.acard-name{font-size:13px;font-weight:500;color:var(--color-text-primary);padding-bottom:0.4rem;margin-bottom:0.4rem;border-bottom:0.5px solid var(--color-border-tertiary);}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:0.3rem;}
+.chip{font-size:11px;padding:2px 9px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary);}
+.chip.pk{background:var(--color-background-info);color:var(--color-text-info);border-color:transparent;font-weight:500;}
+.chip.en{background:var(--color-background-warning);color:var(--color-text-warning);border-color:transparent;}
+.chip.nuevo{background:var(--color-background-success);color:var(--color-text-success);border-color:transparent;}
+.rel-t{width:100%;border-collapse:collapse;font-size:13px;}
+.rel-t th{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-align:left;padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-transform:uppercase;letter-spacing:0.04em;}
+.rel-t td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:top;font-size:13px;}
+.rel-t tr:last-child td{border-bottom:none;}
+.b11{background:var(--color-background-success);color:var(--color-text-success);font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap;}
+.b1m{background:var(--color-background-info);color:var(--color-text-info);font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap;}
+.bnm{background:var(--color-background-danger);color:var(--color-text-danger);font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap;}
+.bher{background:var(--color-background-warning);color:var(--color-text-warning);font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap;}
+.nota{font-size:12px;color:var(--color-text-secondary);margin-top:0.6rem;padding:0.5rem 0.75rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md);line-height:1.5;}
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:0.6rem;}
+.vs-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:0.7rem 0.9rem;}
+.vs-title{font-size:12px;font-weight:500;margin-bottom:0.4rem;color:var(--color-text-primary);}
+.vs-body{font-size:12px;color:var(--color-text-secondary);line-height:1.55;}
+</style>
+
+<h2 class="sr-only">Refresh interactivo: construcción del modelo conceptual — taller mecánico corregido</h2>
+
+<div class="wrap">
+<div id="slides">
+
+<!-- SLIDE 1: CONTEXTO -->
+<div class="slide active" id="s0">
+  <div class="step-header">
+    <span class="step-badge">Paso 1 de 5</span>
+    <span class="step-title">Contexto — punto de partida</span>
+  </div>
+  <div class="teoria">
+    <h3>Principio fundamental</h3>
+    <div class="principio">Todo lo que se modela viene del requerimiento. Si no está en el contexto, no se modela. Ante cualquier duda o debate, la respuesta siempre es volver a lo que el negocio dijo, no a la opinión de quien modela.</div>
+  </div>
+  <div class="ejemplo">
+    <h3>Contexto — Sistema de gestión para taller mecánico</h3>
+    <div class="ctx-section"><div class="ctx-title">Clientes y vehículos</div><div class="ctx-text">Atendemos a clientes que traen sus vehículos. Un cliente puede tener más de un vehículo registrado. De cada vehículo guardamos sus datos: marca, modelo, año, color y placa. Cada vehículo tiene su propia ficha técnica donde anotamos detalles técnicos como tipo de motor, kilometraje y observaciones generales.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Reservas</div><div class="ctx-text">Un cliente puede llamar o ingresar al sistema y reservar un turno antes de traer su vehículo. En la reserva se anota la fecha, la hora y el motivo aproximado de la visita. Cuando el cliente llega, esa reserva se convierte en una orden de trabajo.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Órdenes de trabajo</div><div class="ctx-text">Cuando entra un vehículo se abre una orden de trabajo. En esa orden se registran los servicios que se van a realizar y los repuestos que se van a usar. Una orden queda asignada a un mecánico.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Servicios</div><div class="ctx-text">Tenemos un catálogo de servicios organizados por categoría: mecánica, chapa y pintura, electricidad, entre otros. Una orden puede incluir varios servicios y un mismo servicio puede aparecer en muchas órdenes.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Repuestos e inventario</div><div class="ctx-text">Manejamos un inventario de repuestos. Cuando se usa un repuesto en una orden se descuenta del stock. Una orden puede usar varios repuestos y un repuesto puede usarse en muchas órdenes.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Pagos</div><div class="ctx-text">Al cerrar la orden el cliente realiza el pago. Aceptamos efectivo, tarjeta y QR. Un cliente puede pagar en partes, por lo que una orden puede tener más de un pago registrado.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Mecánicos y turnos</div><div class="ctx-text">Los mecánicos tienen turnos de trabajo con horario de entrada y salida. Una orden se asigna dentro del turno activo del mecánico.</div></div>
+    <div class="ctx-section"><div class="ctx-title">Usuarios y roles</div><div class="ctx-text">El sistema tiene usuarios. Un usuario puede tener rol de administrador, mecánico o cliente. El administrador tiene acceso total al sistema. El mecánico solo puede ver y gestionar sus propias órdenes. El cliente puede registrarse, hacer reservas, consultar el estado de su vehículo y ver sus órdenes de trabajo.</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 2: ENTIDADES -->
+<div class="slide" id="s1">
+  <div class="step-header">
+    <span class="step-badge">Paso 2 de 5</span>
+    <span class="step-title">Identificación de entidades</span>
+  </div>
+  <div class="teoria">
+    <h3>¿Cómo se identifican?</h3>
+    <div class="pregunta">"¿Necesito guardar datos de esto para que el negocio funcione?"</div>
+    <p style="font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin-top:0.6rem;">Se buscan los <strong>sustantivos</strong> del contexto. Además identificar si es <strong>normal</strong>, <strong>débil</strong> (no existe sin otra) o <strong>especialización</strong> (herencia).</p>
+    <div class="vs-grid">
+      <div class="vs-card"><div class="vs-title" style="color:#E89A9A;">Entidad débil</div><div class="vs-body">No tiene sentido sin su entidad fuerte. FICHA_TECNICA no existe sin VEHICULO. PAGO no existe sin ORDEN_TRABAJO.</div></div>
+      <div class="vs-card"><div class="vs-title" style="color:#5FB89A;">Especialización overlapping (o)</div><div class="vs-body">Un usuario puede tener más de un rol al mismo tiempo. Ejemplo: un mecánico puede traer su propio vehículo y actuar como cliente también.</div></div>
+    </div>
+  </div>
+  <div class="ejemplo">
+    <h3>Entidades identificadas del contexto</h3>
+    <div class="leyenda">
+      <div class="ley"><div style="width:10px;height:10px;border-radius:2px;background:#7BA7E0;"></div> Normal</div>
+      <div class="ley"><div style="width:10px;height:10px;border-radius:2px;background:#E89A9A;"></div> Débil</div>
+      <div class="ley"><div style="width:10px;height:10px;border-radius:2px;background:#5FB89A;"></div> Especialización overlapping (o)</div>
+    </div>
+    <div class="ent-grid">
+      <div class="ent-card normal"><div class="ent-name">USUARIO</div><div class="ent-note">entidad padre — herencia overlapping (o)</div></div>
+      <div class="ent-card herencia"><div class="ent-name">CLIENTE</div><div class="ent-note">especialización de USUARIO</div></div>
+      <div class="ent-card herencia"><div class="ent-name">MECANICO</div><div class="ent-note">especialización de USUARIO</div></div>
+      <div class="ent-card herencia"><div class="ent-name">ADMINISTRADOR</div><div class="ent-note">especialización de USUARIO</div></div>
+      <div class="ent-card normal"><div class="ent-name">VEHICULO</div><div class="ent-note">pertenece a un cliente</div></div>
+      <div class="ent-card debil"><div class="ent-name">FICHA_TECNICA</div><div class="ent-note">débil — depende de VEHICULO</div></div>
+      <div class="ent-card normal"><div class="ent-name">RESERVA</div><div class="ent-note">puede convertirse en orden</div></div>
+      <div class="ent-card normal"><div class="ent-name">ORDEN_TRABAJO</div><div class="ent-note">núcleo del negocio</div></div>
+      <div class="ent-card normal"><div class="ent-name">CATEGORIA_SERVICIO</div><div class="ent-note">agrupa los servicios</div></div>
+      <div class="ent-card normal"><div class="ent-name">SERVICIO</div><div class="ent-note">catálogo de servicios</div></div>
+      <div class="ent-card normal"><div class="ent-name">REPUESTO</div><div class="ent-note">inventario con stock</div></div>
+      <div class="ent-card debil"><div class="ent-name">PAGO</div><div class="ent-note">débil — depende de ORDEN_TRABAJO</div></div>
+      <div class="ent-card normal"><div class="ent-name">TURNO</div><div class="ent-note">horario del mecánico</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: ATRIBUTOS -->
+<div class="slide" id="s2">
+  <div class="step-header">
+    <span class="step-badge">Paso 3 de 5</span>
+    <span class="step-title">Identificación de atributos</span>
+  </div>
+  <div class="teoria">
+    <h3>Pregunta clave</h3>
+    <div class="pregunta">"¿Qué información necesito guardar de esta entidad para que el negocio funcione?"</div>
+    <p style="font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin-top:0.6rem;">Siempre viene del contexto. Si el dueño no lo mencionó, no se inventa.</p>
+
+    <h3 style="margin-top:1rem;">¿Puede repetirse el mismo nombre de atributo en distintas entidades?</h3>
+    <div class="regla">Sí, sin problema. El atributo "nombre" en CLIENTE es distinto al "nombre" en SERVICIO, aunque se llamen igual. Cada atributo pertenece a su entidad.</div>
+
+    <h3 style="margin-top:1rem;">¿Hay un mínimo de atributos?</h3>
+    <div class="regla">Toda entidad necesita mínimo su <strong>PK</strong> y al menos <strong>un atributo descriptivo</strong>. Una entidad con solo PK es señal de que algo está mal modelado o le faltan atributos del contexto.</div>
+
+    <h3 style="margin-top:1rem;">¿Cuándo algo merece ser entidad vs atributo?</h3>
+    <div class="pregunta">"¿Necesito guardar más de un dato sobre esto, o necesito reutilizarlo en varias partes?"</div>
+    <div class="vs-grid" style="margin-top:0.6rem;">
+      <div class="vs-card">
+        <div class="vs-title">ROL como atributo enum</div>
+        <div class="vs-body">Si solo necesitas saber qué rol tiene el usuario y no hay nada más que guardar del rol. En este caso aplica porque la especialización ya se maneja con herencia overlapping.</div>
+      </div>
+      <div class="vs-card">
+        <div class="vs-title">ROL como entidad</div>
+        <div class="vs-body">Si el rol tiene permisos propios, descripción, fecha de asignación, si un usuario puede tener varios roles distintos con configuración propia. Ahí ya merece ser entidad.</div>
+      </div>
+    </div>
+  </div>
+  <div class="ejemplo">
+    <h3>Atributos por entidad — sin tipo de dato (eso es el modelo lógico)</h3>
+    <div class="attr-grid">
+      <div class="acard"><div class="acard-name">USUARIO</div><div class="chips"><span class="chip pk">id_usuario PK</span><span class="chip">nombre</span><span class="chip">apellido</span><span class="chip">correo</span><span class="chip">contraseña</span><span class="chip en">rol (enum)</span></div></div>
+      <div class="acard"><div class="acard-name">CLIENTE <span style="font-size:11px;color:var(--color-text-secondary);">hereda de USUARIO</span></div><div class="chips"><span class="chip">telefono</span><span class="chip">direccion</span></div></div>
+      <div class="acard"><div class="acard-name">MECANICO <span style="font-size:11px;color:var(--color-text-secondary);">hereda de USUARIO</span></div><div class="chips"><span class="chip">especialidad</span><span class="chip">fecha_ingreso</span></div></div>
+      <div class="acard"><div class="acard-name">ADMINISTRADOR <span style="font-size:11px;color:var(--color-text-secondary);">hereda de USUARIO</span></div><div class="chips"><span class="chip">nivel_acceso</span></div></div>
+      <div class="acard"><div class="acard-name">VEHICULO</div><div class="chips"><span class="chip pk">id_vehiculo PK</span><span class="chip">placa</span><span class="chip">marca</span><span class="chip">modelo</span><span class="chip">año</span><span class="chip">color</span></div></div>
+      <div class="acard">
+        <div class="acard-name">FICHA_TECNICA <span style="font-size:11px;color:#E89A9A;">débil de VEHICULO</span></div>
+        <div class="chips"><span class="chip pk">num_ficha PK parcial</span><span class="chip">tipo_motor</span><span class="chip">num_chasis</span><span class="chip">num_motor</span><span class="chip">cilindrada</span></div>
+        <div class="aclaracion">Es como el carnet de identidad del vehículo: datos fijos que no cambian en cada ingreso. Lo que varía por ingreso (kilometraje, observaciones, condiciones) va en ORDEN_TRABAJO.</div>
+      </div>
+      <div class="acard"><div class="acard-name">RESERVA</div><div class="chips"><span class="chip pk">id_reserva PK</span><span class="chip">fecha</span><span class="chip">hora</span><span class="chip">motivo</span><span class="chip en">estado (enum)</span></div></div>
+      <div class="acard">
+        <div class="acard-name">ORDEN_TRABAJO</div>
+        <div class="chips"><span class="chip pk">id_orden PK</span><span class="chip">fecha_apertura</span><span class="chip">fecha_cierre</span><span class="chip en">estado (enum)</span><span class="chip">descripcion</span><span class="chip nuevo">kilometraje_ingreso</span><span class="chip nuevo">condiciones</span></div>
+      </div>
+      <div class="acard"><div class="acard-name">CATEGORIA_SERVICIO</div><div class="chips"><span class="chip pk">id_categoria PK</span><span class="chip">nombre</span><span class="chip">descripcion</span></div></div>
+      <div class="acard"><div class="acard-name">SERVICIO</div><div class="chips"><span class="chip pk">id_servicio PK</span><span class="chip">nombre</span><span class="chip">precio</span><span class="chip">descripcion</span></div></div>
+      <div class="acard"><div class="acard-name">REPUESTO</div><div class="chips"><span class="chip pk">id_repuesto PK</span><span class="chip">nombre</span><span class="chip">precio_unitario</span><span class="chip">stock</span><span class="chip">stock_minimo</span></div></div>
+      <div class="acard"><div class="acard-name">PAGO <span style="font-size:11px;color:#E89A9A;">débil de ORDEN_TRABAJO</span></div><div class="chips"><span class="chip pk">num_pago PK parcial</span><span class="chip">monto</span><span class="chip">fecha</span><span class="chip en">metodo_pago (enum)</span></div></div>
+      <div class="acard"><div class="acard-name">TURNO</div><div class="chips"><span class="chip pk">id_turno PK</span><span class="chip">fecha</span><span class="chip">hora_entrada</span><span class="chip">hora_salida</span></div></div>
+    </div>
+    <div class="nota">enum = valor fijo de opciones cerradas. Los tipos de dato se asignan en el modelo lógico, no aquí. Rol: administrador / mecánico / cliente. Estado reserva: pendiente / confirmada / cancelada. Método de pago: efectivo / tarjeta / QR.</div>
+  </div>
+</div>
+
+<!-- SLIDE 4: RELACIONES -->
+<div class="slide" id="s3">
+  <div class="step-header">
+    <span class="step-badge">Paso 4 de 5</span>
+    <span class="step-title">Identificación de relaciones</span>
+  </div>
+  <div class="teoria">
+    <h3>¿Cómo se identifican?</h3>
+    <div class="pregunta">"¿Una entidad necesita conocer a la otra para que el negocio funcione?"</div>
+    <p style="font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin-top:0.6rem;">Si el contexto lo dice, se relacionan. Si no lo dice, no se asume. No se relacionan todas las entidades entre sí solo porque existen en el mismo sistema.</p>
+    <div class="warn">Error común: relacionar todo con todo. Cada relación debe tener justificación en el contexto.</div>
+  </div>
+  <div class="ejemplo">
+    <h3>Relaciones identificadas del contexto</h3>
+    <table class="rel-t">
+      <thead><tr><th>Entidad A</th><th>Entidad B</th><th>Justificación desde el contexto</th></tr></thead>
+      <tbody>
+        <tr><td>USUARIO</td><td>CLIENTE / MECANICO / ADMINISTRADOR</td><td>"Un usuario puede tener rol de administrador, mecánico o cliente" — herencia overlapping (o): un usuario puede ser mecánico y cliente al mismo tiempo</td></tr>
+        <tr><td>CLIENTE</td><td>VEHICULO</td><td>"Un cliente puede tener más de un vehículo registrado"</td></tr>
+        <tr><td>VEHICULO</td><td>FICHA_TECNICA</td><td>"Cada vehículo tiene su propia ficha técnica" — datos fijos de identificación, no cambian por ingreso</td></tr>
+        <tr><td>CLIENTE</td><td>RESERVA</td><td>"Un cliente puede reservar un turno" — necesitamos saber quién reservó</td></tr>
+        <tr><td>VEHICULO</td><td>RESERVA</td><td>La reserva es para un vehículo específico</td></tr>
+        <tr><td>RESERVA</td><td>ORDEN_TRABAJO</td><td>"Cuando el cliente llega, esa reserva se convierte en una orden de trabajo"</td></tr>
+        <tr><td>VEHICULO</td><td>ORDEN_TRABAJO</td><td>"Cuando entra un vehículo se abre una orden de trabajo"</td></tr>
+        <tr><td>MECANICO</td><td>TURNO</td><td>"Los mecánicos tienen turnos de trabajo"</td></tr>
+        <tr><td>TURNO</td><td>ORDEN_TRABAJO</td><td>"Una orden se asigna dentro del turno activo del mecánico"</td></tr>
+        <tr><td>CATEGORIA_SERVICIO</td><td>SERVICIO</td><td>"Catálogo de servicios organizados por categoría"</td></tr>
+        <tr><td>ORDEN_TRABAJO</td><td>SERVICIO</td><td>"En esa orden se registran los servicios que se van a realizar"</td></tr>
+        <tr><td>ORDEN_TRABAJO</td><td>REPUESTO</td><td>"En esa orden se registran los repuestos que se van a usar"</td></tr>
+        <tr><td>ORDEN_TRABAJO</td><td>PAGO</td><td>"Una orden puede tener más de un pago registrado" — débil</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 5: CARDINALIDADES -->
+<div class="slide" id="s4">
+  <div class="step-header">
+    <span class="step-badge">Paso 5 de 5</span>
+    <span class="step-title">Identificación de cardinalidades</span>
+  </div>
+  <div class="teoria">
+    <h3>¿Cómo se determina la cardinalidad?</h3>
+    <div class="pregunta">"¿Un X puede tener varios Y?" &nbsp;+&nbsp; "¿Un Y puede tener varios X?"</div>
+    <p style="font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin-top:0.6rem;">La combinación da la cardinalidad máxima: <strong>1:1</strong>, <strong>1:M</strong> o <strong>N:M</strong>. El mínimo (0 o 1) viene de si la participación es opcional u obligatoria según el contexto.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:0.75rem;align-items:center;">
+      <span class="b11">1:1</span><span style="font-size:13px;color:var(--color-text-secondary);">uno a uno</span>
+      <span class="b1m">1:M</span><span style="font-size:13px;color:var(--color-text-secondary);">uno a muchos</span>
+      <span class="bnm">N:M</span><span style="font-size:13px;color:var(--color-text-secondary);">muchos a muchos → genera tabla intermedia en el modelo lógico</span>
+      <span class="bher">herencia (o)</span><span style="font-size:13px;color:var(--color-text-secondary);">overlapping — un usuario puede tener más de un rol</span>
+    </div>
+  </div>
+  <div class="ejemplo">
+    <h3>Cardinalidades — Taller mecánico</h3>
+    <table class="rel-t">
+      <thead><tr><th>Relación</th><th>Cardinalidad</th><th>Razonamiento</th></tr></thead>
+      <tbody>
+        <tr><td>USUARIO → CLIENTE / MECANICO / ADMIN</td><td><span class="bher">herencia (o)</span></td><td>Overlapping: un usuario puede ser mecánico y cliente al mismo tiempo. No es exclusivo.</td></tr>
+        <tr><td>CLIENTE — VEHICULO</td><td><span class="b1m">1:M</span></td><td>Un cliente puede tener varios vehículos. Un vehículo pertenece a un solo cliente.</td></tr>
+        <tr><td>VEHICULO — FICHA_TECNICA</td><td><span class="b11">1:1</span></td><td>Un vehículo tiene una sola ficha técnica fija (como el carnet de identidad). No se genera una nueva ficha en cada ingreso — eso va en ORDEN_TRABAJO.</td></tr>
+        <tr><td>CLIENTE — RESERVA</td><td><span class="b1m">1:M</span></td><td>Un cliente puede hacer varias reservas a lo largo del tiempo.</td></tr>
+        <tr><td>VEHICULO — RESERVA</td><td><span class="b1m">1:M</span></td><td>Un vehículo puede tener varias reservas en distintos momentos.</td></tr>
+        <tr><td>RESERVA — ORDEN_TRABAJO</td><td><span class="b11">1:1</span></td><td>Una reserva genera una sola orden. Una orden viene de una sola reserva.</td></tr>
+        <tr><td>VEHICULO — ORDEN_TRABAJO</td><td><span class="b1m">1:M</span></td><td>Un vehículo puede tener varias órdenes a lo largo del tiempo (cada ingreso es una orden).</td></tr>
+        <tr><td>MECANICO — TURNO</td><td><span class="b1m">1:M</span></td><td>Un mecánico tiene varios turnos. Un turno pertenece a un mecánico.</td></tr>
+        <tr><td>TURNO — ORDEN_TRABAJO</td><td><span class="b1m">1:M</span></td><td>En un turno se pueden atender varias órdenes de trabajo.</td></tr>
+        <tr><td>CATEGORIA_SERVICIO — SERVICIO</td><td><span class="b1m">1:M</span></td><td>Una categoría agrupa varios servicios. Un servicio pertenece a una categoría.</td></tr>
+        <tr><td>ORDEN_TRABAJO — SERVICIO</td><td><span class="bnm">N:M</span></td><td>Una orden incluye varios servicios. Un servicio aparece en muchas órdenes.</td></tr>
+        <tr><td>ORDEN_TRABAJO — REPUESTO</td><td><span class="bnm">N:M</span></td><td>Una orden usa varios repuestos. Un repuesto se usa en muchas órdenes.</td></tr>
+        <tr><td>ORDEN_TRABAJO — PAGO</td><td><span class="b1m">1:M</span></td><td>Una orden puede tener varios pagos (pago en partes). Un pago pertenece a una orden.</td></tr>
+      </tbody>
+    </table>
+    <div class="nota">Las N:M generan tablas intermedias en el modelo lógico: DETALLE_SERVICIO (cantidad, precio) y DETALLE_REPUESTO (cantidad, precio_unitario). Esos atributos de las intermedias también vienen del contexto — el negocio necesita saber cuánto se usó y a qué precio.</div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button id="bp" onclick="go(-1)" disabled>Anterior</button>
+  <div class="dots" id="dotbox"></div>
+  <button id="bn" onclick="go(1)">Siguiente</button>
+</div>
+</div>
+
+<script>
+var cur=0,tot=5;
+var db=document.getElementById('dotbox');
+for(var i=0;i<tot;i++){
+  var d=document.createElement('div');
+  d.className='dot'+(i===0?' on':'');
+  (function(idx){d.onclick=function(){ir(idx);};})(i);
+  db.appendChild(d);
+}
+function ir(n){
+  document.getElementById('s'+cur).classList.remove('active');
+  db.children[cur].classList.remove('on');
+  cur=n;
+  document.getElementById('s'+cur).classList.add('active');
+  db.children[cur].classList.add('on');
+  document.getElementById('bp').disabled=cur===0;
+  document.getElementById('bn').disabled=cur===tot-1;
+}
+function go(d){ir(Math.max(0,Math.min(tot-1,cur+d)));}
+</script>
