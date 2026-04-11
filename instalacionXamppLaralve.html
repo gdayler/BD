@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía XAMPP + Laravel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:wght@400;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'JetBrains Mono',monospace;background:#0f0f0f;color:#e0e0e0;padding:2rem;min-height:100vh}
+  .wrap{max-width:860px;margin:0 auto}
+  .hero{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid #2a2a2a}
+  .hero-badge{background:#E24B4A;color:#fff;font-size:11px;font-weight:500;padding:4px 10px;border-radius:4px;letter-spacing:.08em;display:inline-block;margin-bottom:10px}
+  .hero h1{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:#fff;margin-bottom:6px}
+  .hero p{font-size:13px;color:#888}
+  .progress-bar{display:flex;gap:6px;margin-bottom:2rem;flex-wrap:wrap}
+  .pb-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#888;white-space:nowrap;cursor:pointer;padding:6px 10px;border-radius:6px;border:1px solid #2a2a2a;background:#161616;transition:all .2s}
+  .pb-item:hover{border-color:#E24B4A;color:#e0e0e0}
+  .pb-item.done{background:#0a2a1a;border-color:#1D9E75;color:#1D9E75}
+  .pb-item .num{width:18px;height:18px;border-radius:50%;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#e0e0e0}
+  .pb-item.done .num{background:#1D9E75;color:#fff}
+  .section{margin-bottom:1.5rem;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden}
+  .sec-header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#161616;cursor:pointer;user-select:none}
+  .sec-header:hover{background:#1a1a1a}
+  .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+  .sec-title{font-size:14px;font-weight:500;color:#fff;flex:1}
+  .sec-tag{font-size:10px;padding:3px 8px;border-radius:4px;font-weight:500}
+  .chevron{font-size:12px;color:#555;transition:transform .2s}
+  .sec-body{padding:16px;display:none;background:#111}
+  .sec-body.open{display:block}
+  .step{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #1e1e1e}
+  .step:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+  .step-label{font-size:12px;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .step-label strong{color:#ccc;font-weight:500}
+  .cmd-block{background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#e0e0e0;position:relative;overflow-x:auto;white-space:pre}
+  .dollar{color:#1D9E75;margin-right:6px;font-weight:500}
+  .comment{color:#555}
+  .copy-btn{position:absolute;top:8px;right:8px;background:#1e1e1e;border:1px solid #333;color:#888;font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace}
+  .copy-btn:hover{color:#e0e0e0;background:#2a2a2a}
+  .note{background:#0c1a2a;border:1px solid #1a3a5a;border-radius:6px;padding:10px 14px;font-size:12px;color:#5a9fd4;margin-top:10px}
+  .warn{background:#2a1a0a;border:1px solid #5a3a1a;border-radius:6px;padding:10px 14px;font-size:12px;color:#d4a05a;margin-top:10px}
+  .check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .check-box{width:20px;height:20px;border-radius:4px;border:1.5px solid #333;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s;background:transparent}
+  .check-box.checked{background:#1D9E75;border-color:#1D9E75}
+  .check-box.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:600}
+  .check-text{font-size:13px;color:#ccc;line-height:1.6}
+  .check-text code{background:#1e1e1e;padding:1px 5px;border-radius:3px;color:#7dd3fc}
+  .verify-block{background:#0a1a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;margin-top:12px}
+  .verify-title{font-size:11px;color:#555;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+  .url-chip{display:inline-flex;align-items:center;gap:6px;background:#0c2a1a;border:1px solid #1D9E75;color:#1D9E75;padding:5px 10px;border-radius:6px;font-size:12px;font-family:'JetBrains Mono',monospace}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  code{background:#1e1e1e;padding:1px 5px;border-radius:3px;color:#7dd3fc;font-family:'JetBrains Mono',monospace}
+  @media(max-width:500px){.two-col{grid-template-columns:1fr}.progress-bar{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="hero-badge">GUÍA COMPLETA</span>
+    <h1>Instalación XAMPP + Laravel</h1>
+    <p>Windows · PHP 8.x · Laravel 11 · Composer 2 · Node.js LTS</p>
+  </div>
+
+  <div class="progress-bar" id="progressBar">
+    <div class="pb-item" data-sec="0"><span class="num">1</span>Requisitos</div>
+    <div class="pb-item" data-sec="1"><span class="num">2</span>XAMPP</div>
+    <div class="pb-item" data-sec="2"><span class="num">3</span>PHP & Composer</div>
+    <div class="pb-item" data-sec="3"><span class="num">4</span>Node.js</div>
+    <div class="pb-item" data-sec="4"><span class="num">5</span>Laravel</div>
+    <div class="pb-item" data-sec="5"><span class="num">6</span>Proyecto nuevo</div>
+    <div class="pb-item" data-sec="6"><span class="num">7</span>Verificación</div>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <div class="section" id="sec0">
+    <div class="sec-header" onclick="toggle(0)">
+      <div class="step-num" style="background:#3a1a1a;color:#E24B4A">1</div>
+      <span class="sec-title">Requisitos previos</span>
+      <span class="sec-tag" style="background:#3a1a1a;color:#E24B4A">Obligatorio</span>
+      <span class="chevron" id="chev0">▼</span>
+    </div>
+    <div class="sec-body open" id="body0">
+      <div class="step">
+        <div class="step-label">Sistema operativo compatible</div>
+        <div class="two-col">
+          <div style="background:#0a2a1a;border:1px solid #1D9E75;border-radius:6px;padding:10px;font-size:12px;color:#1D9E75">✓ Windows 10 / 11 (64-bit)</div>
+          <div style="background:#0a2a1a;border:1px solid #1D9E75;border-radius:6px;padding:10px;font-size:12px;color:#1D9E75">✓ 4 GB RAM mínimo (8 GB recomendado)</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-label">Lo que instalaremos en esta guía</div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">XAMPP (Apache + MySQL + PHP)</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Composer (gestor de paquetes PHP)</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Node.js + NPM</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Laravel 11 (vía Composer)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2 -->
+  <div class="section" id="sec1">
+    <div class="sec-header" onclick="toggle(1)">
+      <div class="step-num" style="background:#2a1f0a;color:#d4a05a">2</div>
+      <span class="sec-title">Instalar XAMPP</span>
+      <span class="sec-tag" style="background:#2a1f0a;color:#d4a05a">Apache + MySQL</span>
+      <span class="chevron" id="chev1">▼</span>
+    </div>
+    <div class="sec-body" id="body1">
+      <div class="step">
+        <div class="step-label"><strong>Paso 1</strong> — Descargar XAMPP</div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Ir a <span style="color:#5a9fd4">apachefriends.org</span> y descargar XAMPP para Windows (PHP 8.x)</div></div>
+        <div class="note">Elige la versión con PHP 8.1+ para compatibilidad con Laravel 11</div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Paso 2</strong> — Ejecutar el instalador</div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Ejecutar <code>xampp-windows-x64-*.exe</code> como administrador</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Seleccionar componentes: <strong style="color:#e0e0e0">Apache, MySQL, PHP, phpMyAdmin</strong></div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Ruta de instalación: <code>C:\xampp</code> (no cambiar)</div></div>
+        <div class="warn">Si el antivirus bloquea la instalación, desactivarlo temporalmente o agregar excepción para la carpeta C:\xampp</div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Paso 3</strong> — Iniciar servicios en XAMPP Control Panel</div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Abrir XAMPP Control Panel</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Clic en <strong style="color:#e0e0e0">Start</strong> junto a <strong style="color:#e0e0e0">Apache</strong> → debe ponerse verde</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Clic en <strong style="color:#e0e0e0">Start</strong> junto a <strong style="color:#e0e0e0">MySQL</strong> → debe ponerse verde</div></div>
+        <div class="verify-block">
+          <div class="verify-title">Verificar en el navegador</div>
+          <div class="url-chip">http://localhost</div>
+          <div style="font-size:12px;color:#555;margin-top:8px">Debe aparecer el dashboard de XAMPP con fondo naranja</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3 -->
+  <div class="section" id="sec2">
+    <div class="sec-header" onclick="toggle(2)">
+      <div class="step-num" style="background:#0c1a2a;color:#5a9fd4">3</div>
+      <span class="sec-title">Verificar PHP y agregar al PATH + Instalar Composer</span>
+      <span class="sec-tag" style="background:#0c1a2a;color:#5a9fd4">PHP 8.x</span>
+      <span class="chevron" id="chev2">▼</span>
+    </div>
+    <div class="sec-body" id="body2">
+      <div class="step">
+        <div class="step-label"><strong>Verificar PHP en CMD</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'php -v')">copiar</button><span class="dollar">$</span>php -v</div>
+        <div class="note">Si dice "no reconocido", necesitas agregar PHP al PATH del sistema</div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Agregar PHP al PATH</strong> (solo si fue necesario)</div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Buscar "Variables de entorno" en el menú inicio de Windows</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">En "Variables del sistema" → seleccionar <strong style="color:#e0e0e0">Path</strong> → Editar</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Agregar nueva entrada: <code>C:\xampp\php</code></div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Aceptar todo y reiniciar CMD</div></div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Instalar Composer</strong></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Descargar <code>Composer-Setup.exe</code> desde <span style="color:#5a9fd4">getcomposer.org</span></div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">En el instalador, apuntar al PHP de XAMPP: <code>C:\xampp\php\php.exe</code></div></div>
+        <div class="step-label" style="margin-top:12px">Verificar instalación:</div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'composer --version')">copiar</button><span class="dollar">$</span>composer --version
+<span class="comment"># Esperado: Composer version 2.x.x</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4 -->
+  <div class="section" id="sec3">
+    <div class="sec-header" onclick="toggle(3)">
+      <div class="step-num" style="background:#0a2a0a;color:#1D9E75">4</div>
+      <span class="sec-title">Instalar Node.js y NPM</span>
+      <span class="sec-tag" style="background:#0a2a0a;color:#1D9E75">Frontend assets</span>
+      <span class="chevron" id="chev3">▼</span>
+    </div>
+    <div class="sec-body" id="body3">
+      <div class="step">
+        <div class="step-label"><strong>Descargar Node.js LTS</strong></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Ir a <span style="color:#5a9fd4">nodejs.org</span> y descargar la versión <strong style="color:#e0e0e0">LTS</strong> (20.x o 22.x)</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Instalar con opciones por defecto (incluye NPM automáticamente)</div></div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Verificar en CMD</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'node -v\nnpm -v')">copiar</button><span class="dollar">$</span>node -v
+<span class="comment"># v20.x.x o superior</span>
+<span class="dollar">$</span>npm -v
+<span class="comment"># 10.x.x o superior</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5 -->
+  <div class="section" id="sec4">
+    <div class="sec-header" onclick="toggle(4)">
+      <div class="step-num" style="background:#1e1a3a;color:#a78bfa">5</div>
+      <span class="sec-title">Instalar Laravel globalmente</span>
+      <span class="sec-tag" style="background:#1e1a3a;color:#a78bfa">Laravel 11</span>
+      <span class="chevron" id="chev4">▼</span>
+    </div>
+    <div class="sec-body" id="body4">
+      <div class="step">
+        <div class="step-label"><strong>Instalar Laravel Installer via Composer</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'composer global require laravel/installer')">copiar</button><span class="dollar">$</span>composer global require laravel/installer</div>
+        <div class="note">Esto instala el comando <code>laravel</code> disponible en todo el sistema</div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Agregar Composer bin al PATH</strong> (si <code>laravel</code> no es reconocido)</div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Agregar al PATH: <code>C:\Users\TuUsuario\AppData\Roaming\Composer\vendor\bin</code></div></div>
+        <div class="warn">Reemplaza "TuUsuario" con tu nombre de usuario real de Windows</div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Verificar Laravel Installer</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'laravel --version')">copiar</button><span class="dollar">$</span>laravel --version
+<span class="comment"># Laravel Installer 5.x.x</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 6 -->
+  <div class="section" id="sec5">
+    <div class="sec-header" onclick="toggle(5)">
+      <div class="step-num" style="background:#0a2a1a;color:#1D9E75">6</div>
+      <span class="sec-title">Crear y configurar un proyecto nuevo</span>
+      <span class="sec-tag" style="background:#0a2a1a;color:#1D9E75">Nuevo proyecto</span>
+      <span class="chevron" id="chev5">▼</span>
+    </div>
+    <div class="sec-body" id="body5">
+      <div class="step">
+        <div class="step-label"><strong>Crear proyecto en htdocs de XAMPP</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'cd C:\\xampp\\htdocs\nlaravel new mi-proyecto')">copiar</button><span class="dollar">$</span>cd C:\xampp\htdocs
+<span class="dollar">$</span>laravel new mi-proyecto</div>
+        <div class="note">El instalador preguntará qué starter kit quieres. Para empezar elige <strong style="color:#e0e0e0">No starter kit</strong></div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Levantar el servidor de desarrollo</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'cd mi-proyecto\nphp artisan serve')">copiar</button><span class="dollar">$</span>cd mi-proyecto
+<span class="dollar">$</span>php artisan serve</div>
+        <div class="verify-block">
+          <div class="verify-title">Verificar en el navegador</div>
+          <div class="url-chip">http://127.0.0.1:8000</div>
+          <div style="font-size:12px;color:#555;margin-top:8px">Debe aparecer la pantalla de bienvenida de Laravel</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Configurar base de datos en .env</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'DB_CONNECTION=mysql\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_DATABASE=mi_proyecto\nDB_USERNAME=root\nDB_PASSWORD=')">copiar</button><span class="comment"># Archivo: .env (raíz del proyecto)</span>
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mi_proyecto
+DB_USERNAME=root
+DB_PASSWORD=<span class="comment">  # En XAMPP, root no tiene contraseña por defecto</span></div>
+        <div class="check-row" style="margin-top:12px"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Crear la BD <code>mi_proyecto</code> en <span style="color:#5a9fd4">http://localhost/phpmyadmin</span></div></div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Ejecutar migraciones</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'php artisan migrate')">copiar</button><span class="dollar">$</span>php artisan migrate</div>
+        <div class="note">Crea las tablas por defecto (users, sessions, etc.) en la base de datos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 7 -->
+  <div class="section" id="sec6">
+    <div class="sec-header" onclick="toggle(6)">
+      <div class="step-num" style="background:#3a1a1a;color:#E24B4A">7</div>
+      <span class="sec-title">Verificación final completa</span>
+      <span class="sec-tag" style="background:#3a1a1a;color:#E24B4A">Checklist</span>
+      <span class="chevron" id="chev6">▼</span>
+    </div>
+    <div class="sec-body" id="body6">
+      <div class="step">
+        <div class="step-label"><strong>Comandos de verificación rápida</strong></div>
+        <div class="cmd-block"><button class="copy-btn" onclick="copyCmd(this,'php -v\ncomposer --version\nnode -v\nnpm -v\nlaravel --version')">copiar todo</button><span class="dollar">$</span>php -v             <span class="comment"># PHP 8.x.x</span>
+<span class="dollar">$</span>composer --version  <span class="comment"># Composer 2.x.x</span>
+<span class="dollar">$</span>node -v            <span class="comment"># v20.x.x</span>
+<span class="dollar">$</span>npm -v             <span class="comment"># 10.x.x</span>
+<span class="dollar">$</span>laravel --version  <span class="comment"># Laravel Installer 5.x.x</span></div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>URLs de verificación en navegador</strong></div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="url-chip">http://localhost</div>
+            <span style="font-size:12px;color:#555">Dashboard XAMPP (fondo naranja)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="url-chip">http://localhost/phpmyadmin</div>
+            <span style="font-size:12px;color:#555">Panel de gestión MySQL</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="url-chip">http://127.0.0.1:8000</div>
+            <span style="font-size:12px;color:#555">Pantalla de bienvenida Laravel</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-label"><strong>Checklist final</strong></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Apache corre en XAMPP (puerto 80, luz verde)</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">MySQL corre en XAMPP (puerto 3306, luz verde)</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text"><code>php -v</code> devuelve 8.x</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text"><code>composer --version</code> devuelve 2.x</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text"><code>node -v</code> y <code>npm -v</code> responden correctamente</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Proyecto Laravel creado en <code>C:\xampp\htdocs\mi-proyecto</code></div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text"><code>php artisan serve</code> levanta en el puerto 8000</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text"><code>php artisan migrate</code> ejecuta sin errores</div></div>
+        <div class="check-row"><div class="check-box" onclick="chk(this)"></div><div class="check-text">Pantalla de bienvenida Laravel visible en el navegador</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+function toggle(i){
+  var b=document.getElementById('body'+i);
+  var c=document.getElementById('chev'+i);
+  var open=b.classList.contains('open');
+  b.classList.toggle('open',!open);
+  c.style.transform=open?'':'rotate(180deg)';
+}
+function chk(el){
+  el.classList.toggle('checked');
+  updateProgress();
+}
+function updateProgress(){
+  var sections=document.querySelectorAll('.section');
+  sections.forEach(function(sec,i){
+    var boxes=sec.querySelectorAll('.check-box');
+    var checked=sec.querySelectorAll('.check-box.checked');
+    var pb=document.querySelector('[data-sec="'+i+'"]');
+    if(pb&&boxes.length>0&&checked.length===boxes.length){
+      pb.classList.add('done');
+    }else if(pb){
+      pb.classList.remove('done');
+    }
+  });
+}
+function copyCmd(btn,text){
+  navigator.clipboard.writeText(text).then(function(){
+    btn.textContent='copiado';
+    setTimeout(function(){btn.textContent='copiar';},1500);
+  });
+}
+</script>
+</body>
+</html>
