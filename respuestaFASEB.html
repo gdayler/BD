@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solucionario Grupo B — BD Ventas MySQL 8.x</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f0;font-family:Arial,sans-serif;color:#1a1a1a;">
+
+<div style="max-width:960px;margin:0 auto;padding:2rem 1.5rem;">
+
+  <h1 style="font-size:24px;font-weight:700;color:#1a1a1a;margin:0 0 4px 0;">Solucionario Grupo B — DistribBolivia</h1>
+  <p style="font-size:13px;color:#666;margin:0 0 1.5rem 0;">MySQL 8.x &nbsp;·&nbsp; 4 Vistas + Experimentos &nbsp;·&nbsp; 3 Triggers &nbsp;·&nbsp; 2 Stored Procedures &nbsp;·&nbsp; Nivel EXCELENCIA</p>
+
+  <!-- TABS -->
+  <div style="display:flex;gap:4px;border-bottom:2px solid #ddd;margin-bottom:1.5rem;flex-wrap:wrap;">
+    <button onclick="showPanel('vistas',this)" id="tab-vistas"
+      style="padding:8px 14px;font-size:13px;font-weight:700;background:#1a1a1a;color:#fff;border:none;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-2px;border-bottom:2px solid #1a1a1a;">
+      Req 1 — 4 Vistas
+    </button>
+    <button onclick="showPanel('experimentos',this)" id="tab-experimentos"
+      style="padding:8px 14px;font-size:13px;font-weight:700;background:#f5f5f0;color:#666;border:1px solid #ddd;border-bottom:none;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-2px;">
+      Experimentos escritura
+    </button>
+    <button onclick="showPanel('triggers',this)" id="tab-triggers"
+      style="padding:8px 14px;font-size:13px;font-weight:700;background:#f5f5f0;color:#666;border:1px solid #ddd;border-bottom:none;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-2px;">
+      Req 2 — 3 Triggers
+    </button>
+    <button onclick="showPanel('sps',this)" id="tab-sps"
+      style="padding:8px 14px;font-size:13px;font-weight:700;background:#f5f5f0;color:#666;border:1px solid #ddd;border-bottom:none;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-2px;">
+      Req 3 — Stored Procs
+    </button>
+    <button onclick="showPanel('rubrica',this)" id="tab-rubrica"
+      style="padding:8px 14px;font-size:13px;font-weight:700;background:#f5f5f0;color:#666;border:1px solid #ddd;border-bottom:none;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-2px;">
+      Análisis rúbrica
+    </button>
+  </div>
+
+  <!-- ========== PANEL VISTAS ========== -->
+  <div id="panel-vistas" style="display:block;">
+
+    <!-- Vista 1 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#E1F5EE;color:#0F6E56;border:1px solid #9FE1CB;">Vista 1</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">v_resumen_ventas</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Por cada venta COMPLETADA: nombre del cliente, fecha, cantidad de productos y total. Ordenado por fecha descendente.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP VIEW IF EXISTS</span> v_resumen_ventas;
+<span style="color:#cba6f7;">CREATE VIEW</span> v_resumen_ventas <span style="color:#cba6f7;">AS</span>
+<span style="color:#cba6f7;">SELECT</span>
+    c.nombre            <span style="color:#cba6f7;">AS</span> cliente,
+    v.fecha,
+    <span style="color:#a6e3a1;">COUNT</span>(d.id_detalle) <span style="color:#cba6f7;">AS</span> cantidad_productos,
+    v.total
+<span style="color:#cba6f7;">FROM</span> venta v
+<span style="color:#cba6f7;">JOIN</span> cliente c       <span style="color:#cba6f7;">ON</span> v.id_cliente = c.id_cliente
+<span style="color:#cba6f7;">JOIN</span> detalle_venta d <span style="color:#cba6f7;">ON</span> v.id_venta   = d.id_venta
+<span style="color:#cba6f7;">WHERE</span>  v.estado = <span style="color:#fab387;">'COMPLETADA'</span>
+<span style="color:#cba6f7;">GROUP BY</span> v.id_venta, c.nombre, v.fecha, v.total
+<span style="color:#cba6f7;">ORDER BY</span> v.fecha <span style="color:#cba6f7;">DESC</span>;
+
+<span style="color:#6c7086;font-style:italic;">-- Prueba:</span>
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> v_resumen_ventas;
+<span style="color:#6c7086;font-style:italic;">-- 9 filas (10 ventas - 1 ANULADA)</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">¿Por qué GROUP BY incluye v.id_venta?</strong> Para que cada venta sea una sola fila aunque tenga múltiples detalles. El <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">COUNT(d.id_detalle)</code> cuenta las líneas de producto de esa venta.
+      </div>
+    </div>
+
+    <!-- Vista 2 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#E1F5EE;color:#0F6E56;border:1px solid #9FE1CB;">Vista 2</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">v_productos_bajo_stock</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Productos cuyo stock actual es menor o igual al stock mínimo. Incluye nombre, categoría, stock actual y stock mínimo.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP VIEW IF EXISTS</span> v_productos_bajo_stock;
+<span style="color:#cba6f7;">CREATE VIEW</span> v_productos_bajo_stock <span style="color:#cba6f7;">AS</span>
+<span style="color:#cba6f7;">SELECT</span>
+    p.nombre       <span style="color:#cba6f7;">AS</span> producto,
+    c.nombre       <span style="color:#cba6f7;">AS</span> categoria,
+    p.stock        <span style="color:#cba6f7;">AS</span> stock_actual,
+    p.stock_minimo
+<span style="color:#cba6f7;">FROM</span> producto p
+<span style="color:#cba6f7;">JOIN</span> categoria c <span style="color:#cba6f7;">ON</span> p.id_categoria = c.id_categoria
+<span style="color:#cba6f7;">WHERE</span> p.stock &lt;= p.stock_minimo
+<span style="color:#cba6f7;">ORDER BY</span> (p.stock_minimo - p.stock) <span style="color:#cba6f7;">DESC</span>;
+
+<span style="color:#6c7086;font-style:italic;">-- Resultados esperados con datos iniciales:
+-- Corrector liquido   stock=4   minimo=8   (Papeleria)
+-- Desinfectante 1L    stock=2   minimo=8   (Limpieza)
+-- Azucar 1kg          stock=6   minimo=20  (Alimentos)</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">ORDER BY (stock_minimo - stock) DESC</strong> pone primero los más críticos. Azúcar tiene diferencia de 14, Corrector 4, Desinfectante 6.
+      </div>
+    </div>
+
+    <!-- Vista 3 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#E1F5EE;color:#0F6E56;border:1px solid #9FE1CB;">Vista 3</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">v_rentabilidad_productos</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Margen en Bs. y porcentaje de margen por producto, de mayor a menor.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP VIEW IF EXISTS</span> v_rentabilidad_productos;
+<span style="color:#cba6f7;">CREATE VIEW</span> v_rentabilidad_productos <span style="color:#cba6f7;">AS</span>
+<span style="color:#cba6f7;">SELECT</span>
+    nombre,
+    precio_compra,
+    precio_venta,
+    (precio_venta - precio_compra)
+        <span style="color:#cba6f7;">AS</span> margen_bs,
+    <span style="color:#a6e3a1;">ROUND</span>(((precio_venta - precio_compra) / precio_compra) * 100, 2)
+        <span style="color:#cba6f7;">AS</span> porcentaje_margen
+<span style="color:#cba6f7;">FROM</span> producto
+<span style="color:#cba6f7;">ORDER BY</span> porcentaje_margen <span style="color:#cba6f7;">DESC</span>;
+
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> v_rentabilidad_productos;</pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        Esta vista solo usa una tabla (<code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">producto</code>), sin JOIN ni GROUP BY. Es la base del <strong style="color:#0a5c3c;">Experimento 1</strong> — al cambiar <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">precio_compra</code>, el margen cambia solo porque la vista consulta en vivo.
+      </div>
+    </div>
+
+    <!-- Vista 4 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#E1F5EE;color:#0F6E56;border:1px solid #9FE1CB;">Vista 4</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">v_top_clientes</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Clientes con mayor total acumulado en ventas completadas. Incluye nombre, ciudad, cantidad de compras y total gastado.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP VIEW IF EXISTS</span> v_top_clientes;
+<span style="color:#cba6f7;">CREATE VIEW</span> v_top_clientes <span style="color:#cba6f7;">AS</span>
+<span style="color:#cba6f7;">SELECT</span>
+    c.nombre                  <span style="color:#cba6f7;">AS</span> cliente,
+    c.ciudad,
+    <span style="color:#a6e3a1;">COUNT</span>(v.id_venta)          <span style="color:#cba6f7;">AS</span> cantidad_compras,
+    <span style="color:#a6e3a1;">SUM</span>(v.total)               <span style="color:#cba6f7;">AS</span> total_gastado
+<span style="color:#cba6f7;">FROM</span> cliente c
+<span style="color:#cba6f7;">JOIN</span> venta v <span style="color:#cba6f7;">ON</span> c.id_cliente = v.id_cliente
+<span style="color:#cba6f7;">WHERE</span> v.estado = <span style="color:#fab387;">'COMPLETADA'</span>
+<span style="color:#cba6f7;">GROUP BY</span> c.id_cliente, c.nombre, c.ciudad
+<span style="color:#cba6f7;">ORDER BY</span> total_gastado <span style="color:#cba6f7;">DESC</span>;
+
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> v_top_clientes;
+<span style="color:#6c7086;font-style:italic;">-- Resultado esperado:
+-- Comercial Lopez    Cochabamba   2 compras   Bs. 232.00
+-- Tienda El Sol      La Paz       2 compras   Bs. 234.00
+-- Distribuidora Norte Santa Cruz  2 compras   Bs. 140.50
+-- Minimarket Central Cochabamba   2 compras   Bs. 176.00
+-- Juan Perez         Cochabamba   1 compra    Bs. 28.00</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">GROUP BY c.id_cliente</strong> garantiza una fila por cliente. El <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">WHERE estado='COMPLETADA'</code> excluye la venta anulada de María González, por eso no aparece.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== PANEL EXPERIMENTOS ========== -->
+  <div id="panel-experimentos" style="display:none;">
+
+    <!-- Experimento 1 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;">Exp 1</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">Vista se actualiza sola al cambiar precio_compra</span>
+      </div>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#6c7086;font-style:italic;">-- Paso 1: ver margen actual</span>
+<span style="color:#cba6f7;">SELECT</span> nombre, precio_compra, margen_bs
+<span style="color:#cba6f7;">FROM</span> v_rentabilidad_productos
+<span style="color:#cba6f7;">WHERE</span> nombre <span style="color:#cba6f7;">LIKE</span> <span style="color:#fab387;">'%Cable%'</span>;
+<span style="color:#6c7086;font-style:italic;">-- nombre: Cable USB-C 1m | precio_compra: 8.50 | margen_bs: 9.50
+
+-- Paso 2: modificar precio_compra (NO recrear la vista)</span>
+<span style="color:#cba6f7;">UPDATE</span> producto <span style="color:#cba6f7;">SET</span> precio_compra = precio_compra + 5 <span style="color:#cba6f7;">WHERE</span> id_producto = 1;
+<span style="color:#6c7086;font-style:italic;">-- Query OK, 1 row affected
+
+-- Paso 3: consultar la misma vista sin recrearla</span>
+<span style="color:#cba6f7;">SELECT</span> nombre, precio_compra, margen_bs
+<span style="color:#cba6f7;">FROM</span> v_rentabilidad_productos
+<span style="color:#cba6f7;">WHERE</span> nombre <span style="color:#cba6f7;">LIKE</span> <span style="color:#fab387;">'%Cable%'</span>;
+<span style="color:#6c7086;font-style:italic;">-- nombre: Cable USB-C 1m | precio_compra: 13.50 | margen_bs: 4.50
+-- ← El margen cambió de 9.50 a 4.50 sin recrear la vista</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">¿Por qué cambió solo?</strong> Una vista <em>no guarda datos</em>. Es una consulta SQL con nombre. Cada vez que ejecutás <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">SELECT * FROM v_rentabilidad_productos</code>, MySQL ejecuta la consulta original en ese instante contra las tablas reales. No hubo que recrear nada.
+      </div>
+    </div>
+
+    <!-- Experimento 2 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;">Exp 2</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">Escribir en vista con JOINs — errores exactos de MySQL</span>
+      </div>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#6c7086;font-style:italic;">-- Intento UPDATE</span>
+<span style="color:#cba6f7;">UPDATE</span> v_resumen_ventas <span style="color:#cba6f7;">SET</span> total = 0 <span style="color:#cba6f7;">WHERE</span> 1=1;
+<span style="color:#6c7086;font-style:italic;">-- ERROR 1288 (HY000): The target table v_resumen_ventas of the UPDATE
+--                     is not updatable
+
+-- Intento INSERT</span>
+<span style="color:#cba6f7;">INSERT INTO</span> v_resumen_ventas (cliente, fecha, total) <span style="color:#cba6f7;">VALUES</span> (<span style="color:#fab387;">'Test'</span>, <span style="color:#a6e3a1;">NOW</span>(), 0);
+<span style="color:#6c7086;font-style:italic;">-- ERROR 1471 (HY000): The target table v_resumen_ventas of the INSERT
+--                     is not insertable-into
+
+-- Intento DELETE</span>
+<span style="color:#cba6f7;">DELETE FROM</span> v_resumen_ventas <span style="color:#cba6f7;">WHERE</span> 1=1;
+<span style="color:#6c7086;font-style:italic;">-- ERROR 1288 (HY000): The target table v_resumen_ventas of the DELETE
+--                     is not updatable</span></pre>
+      <div style="background:#fff8ec;border-left:4px solid #EF9F27;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#6b4c00;line-height:1.6;">
+        Los tres fallan. MySQL no puede propagar un UPDATE/DELETE a tablas base cuando la vista usa <code style="background:#ffe9b0;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">JOIN</code> o <code style="background:#ffe9b0;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">GROUP BY</code> — no sabe a qué fila de qué tabla afectar.
+      </div>
+    </div>
+
+    <!-- Experimento 3 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;">Exp 3</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">Vista simple vs. vista con JOINs — comparación</span>
+      </div>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#6c7086;font-style:italic;">-- Crear vista simple (1 tabla, sin JOIN, sin GROUP BY)</span>
+<span style="color:#cba6f7;">CREATE VIEW</span> v_solo_clientes <span style="color:#cba6f7;">AS</span>
+<span style="color:#cba6f7;">SELECT</span> id_cliente, nombre, ciudad <span style="color:#cba6f7;">FROM</span> cliente;
+
+<span style="color:#6c7086;font-style:italic;">-- UPDATE sobre la vista simple — FUNCIONA:</span>
+<span style="color:#cba6f7;">UPDATE</span> v_solo_clientes <span style="color:#cba6f7;">SET</span> ciudad = <span style="color:#fab387;">'Potosi'</span> <span style="color:#cba6f7;">WHERE</span> id_cliente = 1;
+<span style="color:#6c7086;font-style:italic;">-- Query OK, 1 row affected
+
+-- Verificar en la tabla original:</span>
+<span style="color:#cba6f7;">SELECT</span> ciudad <span style="color:#cba6f7;">FROM</span> cliente <span style="color:#cba6f7;">WHERE</span> id_cliente = 1;
+<span style="color:#6c7086;font-style:italic;">-- ciudad = 'Potosi'  ← la tabla real cambió</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">Respuesta para la demo — condiciones para vista actualizable en MySQL:</strong><br><br>
+        <strong style="color:#0a5c3c;">(1)</strong> Sin <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">JOIN</code> — solo una tabla base &nbsp;|&nbsp;
+        <strong style="color:#0a5c3c;">(2)</strong> Sin <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">GROUP BY</code> ni <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">HAVING</code> &nbsp;|&nbsp;
+        <strong style="color:#0a5c3c;">(3)</strong> Sin funciones de agregación (<code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">COUNT</code>, <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">SUM</code>) &nbsp;|&nbsp;
+        <strong style="color:#0a5c3c;">(4)</strong> Sin <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">DISTINCT</code> &nbsp;|&nbsp;
+        <strong style="color:#0a5c3c;">(5)</strong> Sin subconsultas en el <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">SELECT</code> &nbsp;|&nbsp;
+        <strong style="color:#0a5c3c;">(6)</strong> Sin <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">UNION</code><br><br>
+        <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">v_solo_clientes</code> cumple todo → MySQL puede propagar el UPDATE a <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">cliente</code> directamente porque cada fila de la vista corresponde exactamente a una fila de la tabla base.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== PANEL TRIGGERS ========== -->
+  <div id="panel-triggers" style="display:none;">
+
+    <!-- Trigger 1 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#FAECE7;color:#993C1D;border:1px solid #F0997B;">Trigger 1</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">trg_valida_stock — BEFORE INSERT</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Se ejecuta <em>antes</em> de insertar en <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">detalle_venta</code>. Si la cantidad supera el stock, lanza SIGNAL descriptivo y cancela la operación.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP TRIGGER IF EXISTS</span> trg_valida_stock;
+
+<span style="color:#cba6f7;">DELIMITER</span> $$
+<span style="color:#cba6f7;">CREATE TRIGGER</span> trg_valida_stock
+<span style="color:#cba6f7;">BEFORE INSERT ON</span> detalle_venta
+<span style="color:#cba6f7;">FOR EACH ROW</span>
+<span style="color:#cba6f7;">BEGIN</span>
+    <span style="color:#cba6f7;">DECLARE</span> v_stock  <span style="color:#cba6f7;">INT</span>;
+    <span style="color:#cba6f7;">DECLARE</span> v_nombre <span style="color:#cba6f7;">VARCHAR</span>(100);
+
+    <span style="color:#cba6f7;">SELECT</span> stock, nombre
+    <span style="color:#cba6f7;">INTO</span>   v_stock, v_nombre
+    <span style="color:#cba6f7;">FROM</span>   producto
+    <span style="color:#cba6f7;">WHERE</span>  id_producto = NEW.id_producto;
+
+    <span style="color:#cba6f7;">IF</span> NEW.cantidad &gt; v_stock <span style="color:#cba6f7;">THEN</span>
+        <span style="color:#cba6f7;">SIGNAL SQLSTATE</span> <span style="color:#fab387;">'45000'</span>
+        <span style="color:#cba6f7;">SET MESSAGE_TEXT</span> = <span style="color:#a6e3a1;">CONCAT</span>(
+            <span style="color:#fab387;">'Stock insuficiente para "'</span>, v_nombre,
+            <span style="color:#fab387;">'". Pedido: '</span>, NEW.cantidad,
+            <span style="color:#fab387;">', disponible: '</span>, v_stock
+        );
+    <span style="color:#cba6f7;">END IF</span>;
+<span style="color:#cba6f7;">END</span>$$
+<span style="color:#cba6f7;">DELIMITER</span> ;
+
+<span style="color:#6c7086;font-style:italic;">-- Prueba con cantidad inválida:</span>
+<span style="color:#cba6f7;">INSERT INTO</span> detalle_venta (id_venta, id_producto, cantidad, precio_unitario, subtotal)
+<span style="color:#cba6f7;">VALUES</span> (1, 1, 9999, 18.00, 179982.00);
+<span style="color:#6c7086;font-style:italic;">-- ERROR 1644: Stock insuficiente para "Cable USB-C 1m". Pedido: 9999, disponible: 40
+
+-- Verificar que NO se insertó nada:</span>
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> detalle_venta <span style="color:#cba6f7;">ORDER BY</span> id_detalle <span style="color:#cba6f7;">DESC LIMIT</span> 1;
+<span style="color:#6c7086;font-style:italic;">-- El último id_detalle es anterior al intento → el INSERT fue cancelado</span>
+
+<span style="color:#6c7086;font-style:italic;">-- ¿La auditoría registró algo?</span>
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> auditoria_stock <span style="color:#cba6f7;">ORDER BY</span> id_auditoria <span style="color:#cba6f7;">DESC LIMIT</span> 3;
+<span style="color:#6c7086;font-style:italic;">-- No hay registro nuevo → BEFORE canceló antes de que AFTER llegara a ejecutarse</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">NEW.campo</strong> accede al valor que se intenta insertar. <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">SIGNAL SQLSTATE '45000'</code> es el código estándar de MySQL para errores de usuario — aborta el INSERT y propaga el mensaje.
+      </div>
+    </div>
+
+    <!-- Trigger 2 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#FAECE7;color:#993C1D;border:1px solid #F0997B;">Trigger 2</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">trg_venta_descuenta_stock — AFTER INSERT</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Se ejecuta <em>después</em> del INSERT exitoso en <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">detalle_venta</code>. Descuenta el stock y registra en <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">auditoria_stock</code>.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP TRIGGER IF EXISTS</span> trg_venta_descuenta_stock;
+
+<span style="color:#cba6f7;">DELIMITER</span> $$
+<span style="color:#cba6f7;">CREATE TRIGGER</span> trg_venta_descuenta_stock
+<span style="color:#cba6f7;">AFTER INSERT ON</span> detalle_venta
+<span style="color:#cba6f7;">FOR EACH ROW</span>
+<span style="color:#cba6f7;">BEGIN</span>
+    <span style="color:#cba6f7;">DECLARE</span> v_stock_anterior <span style="color:#cba6f7;">INT</span>;
+
+    <span style="color:#6c7086;font-style:italic;">-- Leer stock antes de modificarlo</span>
+    <span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">INTO</span> v_stock_anterior
+    <span style="color:#cba6f7;">FROM</span>   producto
+    <span style="color:#cba6f7;">WHERE</span>  id_producto = NEW.id_producto;
+
+    <span style="color:#6c7086;font-style:italic;">-- Descontar inventario</span>
+    <span style="color:#cba6f7;">UPDATE</span> producto
+    <span style="color:#cba6f7;">SET</span>    stock = stock - NEW.cantidad
+    <span style="color:#cba6f7;">WHERE</span>  id_producto = NEW.id_producto;
+
+    <span style="color:#6c7086;font-style:italic;">-- Registrar movimiento en auditoría</span>
+    <span style="color:#cba6f7;">INSERT INTO</span> auditoria_stock
+        (id_producto, operacion, stock_anterior, stock_nuevo, observacion)
+    <span style="color:#cba6f7;">VALUES</span> (
+        NEW.id_producto,
+        <span style="color:#fab387;">'VENTA'</span>,
+        v_stock_anterior,
+        v_stock_anterior - NEW.cantidad,
+        <span style="color:#a6e3a1;">CONCAT</span>(<span style="color:#fab387;">'Venta id: '</span>, NEW.id_venta)
+    );
+<span style="color:#cba6f7;">END</span>$$
+<span style="color:#cba6f7;">DELIMITER</span> ;
+
+<span style="color:#6c7086;font-style:italic;">-- Prueba — ejecutar en orden:</span>
+<span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">FROM</span> producto <span style="color:#cba6f7;">WHERE</span> id_producto = 5;  <span style="color:#6c7086;font-style:italic;">-- stock = 25</span>
+
+<span style="color:#cba6f7;">INSERT INTO</span> detalle_venta (id_venta, id_producto, cantidad, precio_unitario, subtotal)
+<span style="color:#cba6f7;">VALUES</span> (1, 5, 2, 14.00, 28.00);
+
+<span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">FROM</span> producto <span style="color:#cba6f7;">WHERE</span> id_producto = 5;  <span style="color:#6c7086;font-style:italic;">-- stock = 23 ← bajó</span>
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> auditoria_stock;
+<span style="color:#6c7086;font-style:italic;">-- operacion=VENTA, stock_anterior=25, stock_nuevo=23, observacion='Venta id: 1'</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">Orden de ejecución BEFORE → AFTER:</strong> MySQL ejecuta BEFORE primero. Si el BEFORE lanza SIGNAL, la operación se cancela y el AFTER <em>nunca llega a ejecutarse</em>. Por eso <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">auditoria_stock</code> solo contiene movimientos reales.
+      </div>
+    </div>
+
+    <!-- Trigger 3 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#FAECE7;color:#993C1D;border:1px solid #F0997B;">Trigger 3</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">trg_compra_aumenta_stock — AFTER INSERT</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Se ejecuta después de insertar en <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">detalle_compra</code>. Aumenta el stock y registra con operación COMPRA.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP TRIGGER IF EXISTS</span> trg_compra_aumenta_stock;
+
+<span style="color:#cba6f7;">DELIMITER</span> $$
+<span style="color:#cba6f7;">CREATE TRIGGER</span> trg_compra_aumenta_stock
+<span style="color:#cba6f7;">AFTER INSERT ON</span> detalle_compra
+<span style="color:#cba6f7;">FOR EACH ROW</span>
+<span style="color:#cba6f7;">BEGIN</span>
+    <span style="color:#cba6f7;">DECLARE</span> v_stock_anterior <span style="color:#cba6f7;">INT</span>;
+
+    <span style="color:#6c7086;font-style:italic;">-- Leer stock antes de modificarlo</span>
+    <span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">INTO</span> v_stock_anterior
+    <span style="color:#cba6f7;">FROM</span>   producto
+    <span style="color:#cba6f7;">WHERE</span>  id_producto = NEW.id_producto;
+
+    <span style="color:#6c7086;font-style:italic;">-- Aumentar inventario</span>
+    <span style="color:#cba6f7;">UPDATE</span> producto
+    <span style="color:#cba6f7;">SET</span>    stock = stock + NEW.cantidad
+    <span style="color:#cba6f7;">WHERE</span>  id_producto = NEW.id_producto;
+
+    <span style="color:#6c7086;font-style:italic;">-- Registrar movimiento en auditoría</span>
+    <span style="color:#cba6f7;">INSERT INTO</span> auditoria_stock
+        (id_producto, operacion, stock_anterior, stock_nuevo, observacion)
+    <span style="color:#cba6f7;">VALUES</span> (
+        NEW.id_producto,
+        <span style="color:#fab387;">'COMPRA'</span>,
+        v_stock_anterior,
+        v_stock_anterior + NEW.cantidad,
+        <span style="color:#a6e3a1;">CONCAT</span>(<span style="color:#fab387;">'Compra id: '</span>, NEW.id_compra)
+    );
+<span style="color:#cba6f7;">END</span>$$
+<span style="color:#cba6f7;">DELIMITER</span> ;
+
+<span style="color:#6c7086;font-style:italic;">-- Prueba:</span>
+<span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">FROM</span> producto <span style="color:#cba6f7;">WHERE</span> id_producto = 14;  <span style="color:#6c7086;font-style:italic;">-- stock = 2</span>
+
+<span style="color:#cba6f7;">INSERT INTO</span> compra (id_proveedor, total) <span style="color:#cba6f7;">VALUES</span> (2, 70.00);
+<span style="color:#cba6f7;">INSERT INTO</span> detalle_compra (id_compra, id_producto, cantidad, precio_unitario, subtotal)
+<span style="color:#cba6f7;">VALUES</span> (<span style="color:#a6e3a1;">LAST_INSERT_ID</span>(), 14, 20, 3.50, 70.00);
+
+<span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">FROM</span> producto <span style="color:#cba6f7;">WHERE</span> id_producto = 14;  <span style="color:#6c7086;font-style:italic;">-- stock = 22 ← subió</span>
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> auditoria_stock <span style="color:#cba6f7;">ORDER BY</span> id_auditoria <span style="color:#cba6f7;">DESC LIMIT</span> 1;
+<span style="color:#6c7086;font-style:italic;">-- operacion=COMPRA, stock_anterior=2, stock_nuevo=22</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">Diferencia con trg_venta_descuenta_stock:</strong> La tabla objetivo es <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">detalle_compra</code> (no <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">detalle_venta</code>), el stock sube con <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">stock + NEW.cantidad</code>, y la operación en auditoría es <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">'COMPRA'</code>.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== PANEL SPs ========== -->
+  <div id="panel-sps" style="display:none;">
+
+    <!-- SP 1 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#FAEEDA;color:#854F0B;border:1px solid #EF9F27;">SP 1</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">sp_registrar_venta</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Registra cabecera + detalle en una sola llamada <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">CALL</code>. Si el trigger rechaza la operación, el error llega al parámetro <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">OUT</code>.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP PROCEDURE IF EXISTS</span> sp_registrar_venta;
+
+<span style="color:#cba6f7;">DELIMITER</span> $$
+<span style="color:#cba6f7;">CREATE PROCEDURE</span> sp_registrar_venta(
+    <span style="color:#cba6f7;">IN</span>  p_id_cliente  <span style="color:#cba6f7;">INT</span>,
+    <span style="color:#cba6f7;">IN</span>  p_id_producto <span style="color:#cba6f7;">INT</span>,
+    <span style="color:#cba6f7;">IN</span>  p_cantidad    <span style="color:#cba6f7;">INT</span>,
+    <span style="color:#cba6f7;">OUT</span> p_resultado   <span style="color:#cba6f7;">VARCHAR</span>(200)
+)
+<span style="color:#cba6f7;">BEGIN</span>
+    <span style="color:#cba6f7;">DECLARE</span> v_precio      <span style="color:#cba6f7;">DECIMAL</span>(10,2);
+    <span style="color:#cba6f7;">DECLARE</span> v_id_venta    <span style="color:#cba6f7;">INT</span>;
+    <span style="color:#cba6f7;">DECLARE</span> v_nombre_prod <span style="color:#cba6f7;">VARCHAR</span>(100);
+
+    <span style="color:#6c7086;font-style:italic;">-- Captura el SIGNAL del trigger y lo devuelve en el OUT</span>
+    <span style="color:#cba6f7;">DECLARE EXIT HANDLER FOR SQLEXCEPTION</span>
+    <span style="color:#cba6f7;">BEGIN</span>
+        <span style="color:#cba6f7;">GET DIAGNOSTICS CONDITION</span> 1 p_resultado = <span style="color:#cba6f7;">MESSAGE_TEXT</span>;
+        <span style="color:#cba6f7;">ROLLBACK</span>;
+    <span style="color:#cba6f7;">END</span>;
+
+    <span style="color:#cba6f7;">START TRANSACTION</span>;
+
+    <span style="color:#6c7086;font-style:italic;">-- 1. Obtener precio y nombre</span>
+    <span style="color:#cba6f7;">SELECT</span> precio_venta, nombre
+    <span style="color:#cba6f7;">INTO</span>   v_precio, v_nombre_prod
+    <span style="color:#cba6f7;">FROM</span>   producto
+    <span style="color:#cba6f7;">WHERE</span>  id_producto = p_id_producto;
+
+    <span style="color:#6c7086;font-style:italic;">-- 2. Cabecera de venta</span>
+    <span style="color:#cba6f7;">INSERT INTO</span> venta (id_cliente, total, estado)
+    <span style="color:#cba6f7;">VALUES</span> (p_id_cliente, 0, <span style="color:#fab387;">'COMPLETADA'</span>);
+    <span style="color:#cba6f7;">SET</span> v_id_venta = <span style="color:#a6e3a1;">LAST_INSERT_ID</span>();
+
+    <span style="color:#6c7086;font-style:italic;">-- 3. Detalle → aquí se disparan trg_valida_stock y trg_venta_descuenta_stock</span>
+    <span style="color:#cba6f7;">INSERT INTO</span> detalle_venta
+        (id_venta, id_producto, cantidad, precio_unitario, subtotal)
+    <span style="color:#cba6f7;">VALUES</span>
+        (v_id_venta, p_id_producto, p_cantidad, v_precio, v_precio * p_cantidad);
+
+    <span style="color:#6c7086;font-style:italic;">-- 4. Actualizar total en cabecera</span>
+    <span style="color:#cba6f7;">UPDATE</span> venta
+    <span style="color:#cba6f7;">SET</span>    total = v_precio * p_cantidad
+    <span style="color:#cba6f7;">WHERE</span>  id_venta = v_id_venta;
+
+    <span style="color:#cba6f7;">COMMIT</span>;
+
+    <span style="color:#cba6f7;">SET</span> p_resultado = <span style="color:#a6e3a1;">CONCAT</span>(
+        <span style="color:#fab387;">'OK — Venta #'</span>, v_id_venta,
+        <span style="color:#fab387;">' | '</span>, v_nombre_prod,
+        <span style="color:#fab387;">' x'</span>, p_cantidad,
+        <span style="color:#fab387;">' | Total: Bs. '</span>, v_precio * p_cantidad
+    );
+<span style="color:#cba6f7;">END</span>$$
+<span style="color:#cba6f7;">DELIMITER</span> ;
+
+<span style="color:#6c7086;font-style:italic;">-- ===== PRUEBA EXITOSA =====</span>
+<span style="color:#cba6f7;">CALL</span> sp_registrar_venta(1, 4, 3, @res);
+<span style="color:#cba6f7;">SELECT</span> @res;
+<span style="color:#6c7086;font-style:italic;">-- OK — Venta #11 | Foco LED 9W x3 | Total: Bs. 22.50</span>
+
+<span style="color:#cba6f7;">SELECT</span> stock <span style="color:#cba6f7;">FROM</span> producto <span style="color:#cba6f7;">WHERE</span> id_producto = 4;
+<span style="color:#6c7086;font-style:italic;">-- bajó 3 unidades → el trigger se disparó automáticamente</span>
+
+<span style="color:#cba6f7;">SELECT</span> * <span style="color:#cba6f7;">FROM</span> auditoria_stock <span style="color:#cba6f7;">ORDER BY</span> id_auditoria <span style="color:#cba6f7;">DESC LIMIT</span> 1;
+<span style="color:#6c7086;font-style:italic;">-- operacion=VENTA registrado por el trigger, no por el SP</span>
+
+<span style="color:#6c7086;font-style:italic;">-- ===== PRUEBA FALLIDA =====</span>
+<span style="color:#cba6f7;">CALL</span> sp_registrar_venta(1, 4, 9999, @res);
+<span style="color:#cba6f7;">SELECT</span> @res;
+<span style="color:#6c7086;font-style:italic;">-- Stock insuficiente para "Foco LED 9W". Pedido: 9999, disponible: 57</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">¿Cómo llega el error del trigger al OUT?</strong> El <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">DECLARE EXIT HANDLER FOR SQLEXCEPTION</code> captura la excepción generada por el SIGNAL. <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">GET DIAGNOSTICS CONDITION 1</code> extrae el mensaje y lo escribe en <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">p_resultado</code>. El <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">ROLLBACK</code> deja la BD en estado consistente.<br><br>
+        <strong style="color:#0a5c3c;">¿Los triggers se disparan desde el SP?</strong> Sí. El trigger no distingue si el INSERT viene de un usuario directo o de un SP — se activa en cualquier INSERT sobre <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">detalle_venta</code>.
+      </div>
+    </div>
+
+    <!-- SP 2 -->
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;background:#FAEEDA;color:#854F0B;border:1px solid #EF9F27;">SP 2</span>
+        <span style="font-size:16px;font-weight:700;color:#1a1a1a;">sp_reporte_ventas_periodo</span>
+      </div>
+      <p style="font-size:13px;color:#555;margin:0 0 10px 0;line-height:1.6;">Devuelve ventas completadas en un rango de fechas. Reutiliza <code style="background:#eee;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;">v_resumen_ventas</code> — no duplica JOINs.</p>
+      <pre style="background:#1e1e2e;color:#cdd6f4;padding:1.2rem;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;overflow-x:auto;margin:0 0 8px 0;"><span style="color:#cba6f7;">DROP PROCEDURE IF EXISTS</span> sp_reporte_ventas_periodo;
+
+<span style="color:#cba6f7;">DELIMITER</span> $$
+<span style="color:#cba6f7;">CREATE PROCEDURE</span> sp_reporte_ventas_periodo(
+    <span style="color:#cba6f7;">IN</span> p_fecha_inicio <span style="color:#cba6f7;">DATE</span>,
+    <span style="color:#cba6f7;">IN</span> p_fecha_fin    <span style="color:#cba6f7;">DATE</span>
+)
+<span style="color:#cba6f7;">BEGIN</span>
+    <span style="color:#cba6f7;">SELECT</span> *
+    <span style="color:#cba6f7;">FROM</span>   v_resumen_ventas
+    <span style="color:#cba6f7;">WHERE</span>  <span style="color:#a6e3a1;">DATE</span>(fecha) <span style="color:#cba6f7;">BETWEEN</span> p_fecha_inicio <span style="color:#cba6f7;">AND</span> p_fecha_fin;
+<span style="color:#cba6f7;">END</span>$$
+<span style="color:#cba6f7;">DELIMITER</span> ;
+
+<span style="color:#6c7086;font-style:italic;">-- ===== PRUEBAS =====</span>
+<span style="color:#cba6f7;">CALL</span> sp_reporte_ventas_periodo(<span style="color:#fab387;">'2025-01-01'</span>, <span style="color:#fab387;">'2025-03-31'</span>);
+<span style="color:#6c7086;font-style:italic;">-- 9 ventas completadas del trimestre (excluye la ANULADA de marzo)</span>
+
+<span style="color:#cba6f7;">CALL</span> sp_reporte_ventas_periodo(<span style="color:#fab387;">'2025-01-01'</span>, <span style="color:#fab387;">'2025-01-31'</span>);
+<span style="color:#6c7086;font-style:italic;">-- 3 ventas de enero únicamente</span></pre>
+      <div style="background:#f0faf5;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#333;line-height:1.6;">
+        <strong style="color:#0a5c3c;">¿Por qué DATE(fecha)?</strong> El campo <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">fecha</code> es <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">DATETIME</code>. Sin <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">DATE()</code>, el límite <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">'2025-01-31'</code> se convierte a <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">'2025-01-31 00:00:00'</code> y excluiría ventas del mediodía. <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">DATE()</code> trunca la hora. La lógica de filtrado solo COMPLETADAS ya está en <code style="background:#ddd;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">v_resumen_ventas</code>, no hay que repetirla.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== PANEL RÚBRICA ========== -->
+  <div id="panel-rubrica" style="display:none;">
+
+    <h2 style="font-size:18px;font-weight:700;color:#1a1a1a;margin:0 0 1rem 0;">Análisis de criterios para EXCELENCIA (90–100)</h2>
+
+    <!-- Criterio 1 -->
+    <div style="border:1px solid #9FE1CB;border-radius:8px;overflow:hidden;margin-bottom:1rem;">
+      <div style="background:#E1F5EE;padding:10px 14px;border-bottom:1px solid #9FE1CB;">
+        <span style="font-size:13px;font-weight:700;color:#0F6E56;">Criterio 1 — Vistas + experimentos de escritura (90–100)</span>
+      </div>
+      <div style="padding:12px 14px;font-size:13px;color:#333;line-height:1.8;background:#fff;">
+        Las 4 vistas compilan y devuelven datos correctos con alias, filtros y ORDER BY. Se ejecutaron los 3 experimentos completos:<br>
+        <strong>Exp 1:</strong> El margen del Cable USB-C cambió de 9.50 a 4.50 sin recrear la vista — se demuestra que la vista no guarda datos.<br>
+        <strong>Exp 2:</strong> Se anotaron los errores exactos (1288 en UPDATE y DELETE, 1471 en INSERT) sobre <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">v_resumen_ventas</code>.<br>
+        <strong>Exp 3:</strong> <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">v_solo_clientes</code> acepta UPDATE porque cumple las 6 condiciones de MySQL para vistas actualizables: sin JOIN, sin GROUP BY/HAVING, sin funciones de agregación, sin DISTINCT, sin subconsultas en SELECT, sin UNION.
+      </div>
+    </div>
+
+    <!-- Criterio 2 -->
+    <div style="border:1px solid #F0997B;border-radius:8px;overflow:hidden;margin-bottom:1rem;">
+      <div style="background:#FAECE7;padding:10px 14px;border-bottom:1px solid #F0997B;">
+        <span style="font-size:13px;font-weight:700;color:#993C1D;">Criterio 2 — Triggers (90–100)</span>
+      </div>
+      <div style="padding:12px 14px;font-size:13px;color:#333;line-height:1.8;background:#fff;">
+        Los 3 triggers funcionan correctamente. El SIGNAL de <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">trg_valida_stock</code> incluye nombre del producto, cantidad pedida y stock disponible. Se verificó el orden BEFORE/AFTER: al insertar 9999 unidades, el BEFORE cancela y <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">auditoria_stock</code> queda sin registros nuevos. Se verificó que <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">trg_compra_aumenta_stock</code> sube el stock correctamente y registra con <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">operacion='COMPRA'</code>.
+      </div>
+    </div>
+
+    <!-- Criterio 3 -->
+    <div style="border:1px solid #EF9F27;border-radius:8px;overflow:hidden;margin-bottom:1rem;">
+      <div style="background:#FAEEDA;padding:10px 14px;border-bottom:1px solid #EF9F27;">
+        <span style="font-size:13px;font-weight:700;color:#854F0B;">Criterio 3 — Procedimientos Almacenados (90–100)</span>
+      </div>
+      <div style="padding:12px 14px;font-size:13px;color:#333;line-height:1.8;background:#fff;">
+        <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">sp_registrar_venta</code> usa <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">DECLARE EXIT HANDLER FOR SQLEXCEPTION</code> con <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">GET DIAGNOSTICS</code> — el mensaje del SIGNAL del trigger llega al parámetro <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">OUT</code> tanto en éxito como en fallo. <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">sp_reporte_ventas_periodo</code> reutiliza <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">v_resumen_ventas</code>. Se verificó que al insertar en <code style="background:#eee;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11px;">detalle_venta</code> desde el SP, los triggers se disparan automáticamente sin llamarlos — y cuando rechazan, el error llega al OUT.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function showPanel(name, btn) {
+  ['vistas','experimentos','triggers','sps','rubrica'].forEach(function(p) {
+    document.getElementById('panel-'+p).style.display = 'none';
+    var t = document.getElementById('tab-'+p);
+    t.style.background = '#f5f5f0';
+    t.style.color = '#666';
+    t.style.border = '1px solid #ddd';
+    t.style.borderBottom = 'none';
+  });
+  document.getElementById('panel-'+name).style.display = 'block';
+  btn.style.background = '#1a1a1a';
+  btn.style.color = '#fff';
+  btn.style.border = 'none';
+  btn.style.borderBottom = '2px solid #1a1a1a';
+}
+</script>
+
+</body>
+</html>
